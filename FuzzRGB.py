@@ -1,6 +1,7 @@
 # I'm writing this in Python because I assume it's easier to look up libraries for.
 import os, sys
 from PIL import Image, ImageDraw
+import random
 
 img = Image.new('RGB', [512, 512],(255,255,255))
 #alright so that's correct but i don't know if it's actually generating an image file. I don't think it is.
@@ -26,7 +27,10 @@ height = 512
 #for x in width:
 while (xcoord <= width ):
     draw = ImageDraw.Draw(img)
-    draw.point((xcoord,ycoord), fill=0)
+    rndnum = random.randrange(255)
+    rndnum2 = random.randrange(255)
+    rndnum3 = random.randrange(255)
+    draw.point((xcoord,ycoord), fill=(rndnum,rndnum2,rndnum3))
     xcoord += 1
     if (xcoord == width):
         ycoord += 1
@@ -34,4 +38,4 @@ while (xcoord <= width ):
     if (ycoord == height):
         break
 
-img.save("test2.png")
+img.save("test2.png") #OH MY GOD I DID IT I'M SO PROUD OF MYSELF 
