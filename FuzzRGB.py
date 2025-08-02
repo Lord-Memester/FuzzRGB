@@ -2,8 +2,18 @@
 import os, sys
 from PIL import Image, ImageDraw
 import random
+import math
 
-img = Image.new('RGB', [512, 512],(255,255,255))
+
+#print("Enter image width in pixels: ")
+width = int(input("Enter image width in pixels: "))
+print(f"Width received: {width}")
+#print("Enter image height in pixels: ")
+height = int(input("Enter image height in pixels: "))
+print(f"Height received: {height}")
+
+
+img = Image.new('RGBA', [width, height],(255,255,255, 255))
 #alright so that's correct but i don't know if it's actually generating an image file. I don't think it is.
 #img.save("test.jpg")
 #hey that works, cool! now I have to figure out how to color specific pixels of the image.
@@ -22,15 +32,16 @@ img = Image.new('RGB', [512, 512],(255,255,255))
 
 ycoord = 0
 xcoord = 0
-width = 512
-height = 512
+#numcolors = 3
 #for x in width:
 while (xcoord <= width ):
     draw = ImageDraw.Draw(img)
-    rndnum = random.randrange(255)
-    rndnum2 = random.randrange(255)
-    rndnum3 = random.randrange(255)
-    draw.point((xcoord,ycoord), fill=(rndnum,rndnum2,rndnum3))
+    rndnum = random.randrange(0,256,255)#(256/numcolors)-1)
+    rndnum2 = random.randrange(0,256,255)#(256/numcolors)-1)
+    rndnum3 = random.randrange(0,256,255)#(256/numcolors)-1)
+    rndnum4 = 255 #random.randrange(0,256,255)#(256/numcolors)-1)#alpha value
+    draw.point((xcoord,ycoord), fill=(rndnum,rndnum2,rndnum3,rndnum4))
+    #print(rndnum,rndnum2,rndnum3,rndnum4)
     xcoord += 1
     if (xcoord == width):
         ycoord += 1
@@ -38,4 +49,4 @@ while (xcoord <= width ):
     if (ycoord == height):
         break
 
-img.save("test2.png") #OH MY GOD I DID IT I'M SO PROUD OF MYSELF 
+img.save("test.png") #OH MY GOD I DID IT I'M SO PROUD OF MYSELF 
