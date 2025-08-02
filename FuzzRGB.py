@@ -7,13 +7,31 @@ img = Image.new('RGB', [512, 512],(255,255,255))
 #img.save("test.jpg")
 #hey that works, cool! now I have to figure out how to color specific pixels of the image.
 
-draw = ImageDraw.Draw(img)
-draw.point((0,0), fill=0)
+#draw = ImageDraw.Draw(img)
+#draw.point((0,0), fill=0)
 # i'm gonna try just moving the save statement down here to see if it prevents me from needing to modify the file, since that feels like it would be innefficient
 
-img.save("test2.png")
+
 #alright that also worked but the picture looks wrong and noisy where that pixel is. Maybe PNG would fix it? | Answer: Yes! very cool. Also, PNG supports transparency, which isn't in use (yet) but could be useful later.
 #I'll probably need a for loop that goes over each pixel of the image and randomizes it. There's probably a FAR better way to make the pixels random but I don't know how yet.
 
-# I don't know if this works and also am not sure how to test it right now. I'm just gonna try stuff.
-# It does not work. Also I think I used the wrong module? More trying stuff time.
+#Now I will have to determine how one writes a for loop in python
+
+#I also need to determine how to get user input and use that to set variables. Maybe look at some of my old C++ code from class to recall how to increment an integer up to a limit.
+
+ycoord = 0
+xcoord = 0
+width = 512
+height = 512
+#for x in width:
+while (xcoord <= width ):
+    draw = ImageDraw.Draw(img)
+    draw.point((xcoord,ycoord), fill=0)
+    xcoord += 1
+    if (xcoord == width):
+        ycoord += 1
+        xcoord = 0
+    if (ycoord == height):
+        break
+
+img.save("test2.png")
