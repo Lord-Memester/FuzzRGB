@@ -1,116 +1,118 @@
-# I'm writing this in Python because I assume it's easier to look up libraries for.
-import os, sys
-from PIL import Image, ImageDraw
 import random
-import math
 import threading
-import concurrent.futures
+import multiprocessing
+import math
 import time
-import yappi
+import concurrent.futures
+from PIL import Image, ImageDraw
+print(f"Detected core count: {multiprocessing.cpu_count()}\n") #We get the number of cores to most make use of the multithreading, spreading the workload across all the CPU's cores as evenly as possible.
 
-_NTHREAD = 2
-start_time = time.monotonic_ns()
+i = 0
 
-width = 512 #int(input("Enter image width in pixels: "))
+print("Entries with integer values less than one will be automatically adjusted to a value of one.")
+width = int(input("Enter image width in pixels: "))
+if (width<=0): width=1
 print(f"Width received: {width}")
-height = 512 #int(input("Enter image height in pixels: "))
+height = int(input("Enter image height in pixels: "))
+if (height<=0): height=1
 print(f"Height received: {height}")
 
-img = Image.new('RGBA', [width, height],(255,255,255, 255))
+start_time = time.monotonic() #start overall timer
 
-ycoord = 0
-xcoord = 0
-#numcolors = 3
 
-while (xcoord <= width ):
-    draw = ImageDraw.Draw(img)
-    rndnum1 = random.randrange(0,256,1)
-    rndnum2 = random.randrange(0,256,1)
-    rndnum3 = random.randrange(0,256,1)
-    rndnum4 = 255 #random.randrange(0,256,1) #alpha value
-    draw.point((xcoord,ycoord), fill=(rndnum1,rndnum2,rndnum3,rndnum4))
-    #print(rndnum,rndnum2,rndnum3,rndnum4)
-    xcoord += 1
-    if (xcoord == width):
+subdivisions_x = (math.floor(math.log(width,multiprocessing.cpu_count())))
+subdivisions_y = (math.floor(math.log(height,multiprocessing.cpu_count())))
+
+if (width > height):
+    subdivisions = subdivisions_x
+elif (width < height):
+    subdivisions = subdivisions_y
+elif (width == height):
+    subdivisions = subdivisions_y
+
+
+img = Image.new('RGB', [width, height],(255,255,255)) #Image.new('RGBA', [width, height],(255,255,255, 255))
+
+"""I believe more performance could be squeezed out of the program by generating 
+the color of the pixels as a single decimal value that is then decoded into RGB(A) format.
+It would allow the program to only calculate one random number per pixel. While the current
+approach doesn't seem particularly resource-intensive, it would be an interesting
+challenge and an intruiging experiment whether or not anything comes of it."""
+
+def worker_x():
+    if (subdivisions_x<=0): subdivisions_x=1
+    print(f"Determined subdivisions_x for processing: {subdivisions_x}")
+    active_subdivision_x = [math.floor(width * ((i-1)/(subdivisions_x))), math.floor(width * ((i)/(subdivisions_x)))]
+    active_subdivision_start_x = active_subdivision_x[0]
+    active_subdivision_end_x = active_subdivision_x[1]
+    thread_start_time = time.monotonic()
+    print(f"Thread {i} running.\nactive_subdivision_start_x = {active_subdivision_start_x}\nactive_subdivision_end_x = {active_subdivision_end_x}\n")
+    ycoord = 0
+    xcoord = active_subdivision_start_x
+    while ( xcoord <= active_subdivision_end_x ):
+        draw = ImageDraw.Draw(img)
+        red = random.randrange(0,256,1)
+        green = random.randrange(0,256,1)
+        blue = random.randrange(0,256,1)
+        #alpha = 255 #random.randrange(0,256,1) #alpha value
+        draw.point((xcoord,ycoord), fill=(red,green,blue)) #fill=(red,green,blue,alpha))
+        #print(f"R1: {red}, G1: {green}, B1: {blue}, A1: {alpha}")
+        xcoord += 1
+        if (xcoord == active_subdivision_end_x):
+            ycoord += 1
+            xcoord = 0
+        if (ycoord == height):
+            break
+        thread_end_time = time.monotonic()
+    print(f"A \"columns-based\" thread finished after {thread_end_time - thread_start_time} seconds")
+
+def worker_y():
+    if (subdivisions_y<=0): subdivisions_y=1
+    print(f"Determined subdivisions_y for processing: {subdivisions_y}")
+    active_subdivision_y = [math.floor(height * ((i-1)/(subdivisions_y))), math.floor(height * ((i)/(subdivisions_y)))]
+    active_subdivision_start_y = active_subdivision_y[0]
+    active_subdivision_end_y = active_subdivision_y[1]
+    thread_start_time = time.monotonic()
+    print(f"Thread {i} running.\nactive_subdivision_start_y = {active_subdivision_start_y}\nactive_subdivision_end_y = {active_subdivision_end_y}\n")
+    ycoord = active_subdivision_start_y
+    xcoord = 0
+    while ( ycoord <= active_subdivision_end_y ):
+        draw = ImageDraw.Draw(img)
+        red = random.randrange(0,256,1)
+        green = random.randrange(0,256,1)
+        blue = random.randrange(0,256,1)
+        #alpha = 255 #random.randrange(0,256,1) #alpha value
+        draw.point((xcoord,ycoord), fill=(red,green,blue)) #fill=(red,green,blue,alpha))
+        #print(f"R1: {red}, G1: {green}, B1: {blue}, A1: {alpha}")
         ycoord += 1
-        xcoord = 0
-    if (ycoord == height):
-        break
-
-#def task1():
-#    subdivision1 = math.floor(width/2)
-#    x1coord = 0
-#    y1coord = 0
-#    while (x1coord <= subdivision1 ):
-#        draw = ImageDraw.Draw(img)
-#        rndnum1 = random.randrange(0,256,1)
-#        rndnum2 = random.randrange(0,256,1)
-#        rndnum3 = random.randrange(0,256,1)
-#        rndnum4 = 255 #random.randrange(0,256,1) #alpha value
-#        draw.point((x1coord,y1coord), fill=(rndnum1,rndnum2,rndnum3,rndnum4))
-#        #print(f"R1: {rndnum1}, G1: {rndnum2}, B1: {rndnum3}, A1: {rndnum4}")
-#        x1coord += 1
-#        if (x1coord == subdivision1):
-#            y1coord += 1
-#            x1coord = 0
-#        if (y1coord == height):
-#            break
-#
-#def task2():
-#    time
-#    subdivision2 = math.ceil(width/2)
-#    x2coord = subdivision2
-#    y2coord = 0
-#    while ((x2coord) <= width):
-#        
-#        draw = ImageDraw.Draw(img)
-#        rndnum1 = random.randrange(0,256,1)
-#        rndnum2 = random.randrange(0,256,1)
-#        rndnum3 = random.randrange(0,256,1)
-#        rndnum4 = 255 #random.randrange(0,256,1) #alpha value
-#        draw.point((x2coord,y2coord), fill=(rndnum1,rndnum2,rndnum3,rndnum4))
-#        #print(f"R2: {rndnum1}, G2: {rndnum2}, B2: {rndnum3}, A2: {rndnum4}")
-#        x2coord += 1
-#        if (x2coord == width):
-#            y2coord += 1
-#            x2coord = subdivision2
-#        if (y2coord == height):
-#            #Time2 = time.process_time()
-#            break
-            
-    #img.save("test.png")
+        if (ycoord == active_subdivision_end_y):
+            xcoord += 1
+            ycoord = 0
+        if (xcoord == width):
+            break
+    thread_end_time = time.monotonic()
+    print(f"A \"rows-based\" thread finished after {thread_end_time - thread_start_time} seconds")
 
 
-# I asked a friend, and they agreed that I could optimize this code with a combination of multithreading and by dividing processing into blocks.
-# I should also implement a profiler to quantatively measure performance.
-
-#blockSize = 4
-
-#if __name__ =="__main__":
-#    t1 = threading.Thread(target=task1)
-#    t2 = threading.Thread(target=task2)
-#
-#    t1.start()
-#    t2.start()
-#
-#    t1.join()
-#    t2.join()
+pool = concurrent.futures.ThreadPoolExecutor(subdivisions)
 
 
-end_time = time.monotonic_ns()
+while (i) < subdivisions:
+    i +=1
+    if (width > height):
+        if (i==1): print("\nOptimizing processing for horizontal aspect ratio.\n")
+        pool.submit(worker_x)
+    elif (width < height):
+        if (i==1): print("\nOptimizing processing for vertical aspect ratio.\n")
+        pool.submit(worker_y)
+    elif (width ==height):
+        if (i==1): print("\nThere is currently sub-optimal processing for the 1:1 aspect ratio. This might take a while.\n")
+        pool.submit(worker_y)
+"""I believe the way to truly optimize all processing would be to chop it into squares and do it a square at a time."""
 
-print(f"Duration: {end_time - start_time} ns")
+pool.shutdown(wait=True)
 
+end_time = time.monotonic()
+print(f"\nAll threads completed!\nDuration: {end_time - start_time} seconds\n ")
 
-img.save("test.png")
-
-    #print(f"Thread 2: {Time2}")
-#print("Done!")
-
-
-
-
-
-
-#img1.save("testp1.png") #Epic B)
-#img2.save("testp2.png") #Epic B)
+img.save("Random.png") 
