@@ -40,8 +40,8 @@ approach doesn't seem particularly resource-intensive, it would be an interestin
 challenge and an intruiging experiment whether or not anything comes of it."""
 
 def worker_x(): # used for landscape images
-    print(f"Determined subdivisions_x for processing: {subdivisions_x}")
-    active_subdivision_x = [math.floor(width * ((i-1)/(subdivisions_x))), math.floor(width * ((i)/(subdivisions_x)))]
+    print(f"Determined subdivisions for processing: {subdivisions}")
+    active_subdivision_x = [math.floor(width * ((i-1)/(subdivisions))), math.floor(width * ((i)/(subdivisions)))]
     active_subdivision_start_x = active_subdivision_x[0]
     active_subdivision_end_x = active_subdivision_x[1]
     thread_start_time = time.monotonic()
@@ -66,8 +66,8 @@ def worker_x(): # used for landscape images
     print(f"A \"columns-based\" thread finished after {thread_end_time - thread_start_time} seconds")
 
 def worker_y(): # used for portrait (and square) images
-    print(f"Determined subdivisions_y for processing: {subdivisions_y}")
-    active_subdivision_y = [math.floor(height * ((i-1)/(subdivisions_y))), math.floor(height * ((i)/(subdivisions_y)))]
+    print(f"Determined subdivisions for processing: {subdivisions}")
+    active_subdivision_y = [math.floor(height * ((i-1)/(subdivisions))), math.floor(height * ((i)/(subdivisions)))]
     active_subdivision_start_y = active_subdivision_y[0]
     active_subdivision_end_y = active_subdivision_y[1]
     thread_start_time = time.monotonic()
