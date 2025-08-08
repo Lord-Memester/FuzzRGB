@@ -21,17 +21,17 @@ start_time = time.monotonic() #start overall timer
 
 
 subdivisions_x = (math.floor(math.log(width,multiprocessing.cpu_count())))
+if (subdivisions_x<=0): subdivisions_x=1
 subdivisions_y = (math.floor(math.log(height,multiprocessing.cpu_count())))
+if (subdivisions_y<=0): subdivisions_y=1
 
 if (width > height):
     subdivisions = subdivisions_x
-elif (width < height):
-    subdivisions = subdivisions_y
-elif (width == height):
+elif (width <= height):
     subdivisions = subdivisions_y
 
 
-img = Image.new('RGB', [width, height],(255,255,255)) #Image.new('RGBA', [width, height],(255,255,255, 255))
+img = Image.new('RGB', [width, height],(255,0,0)) #Image.new('RGBA', [width, height],(255,255,255, 255))
 
 """I believe more performance could be squeezed out of the program by generating 
 the color of the pixels as a single decimal value that is then decoded into RGB(A) format.
@@ -39,8 +39,7 @@ It would allow the program to only calculate one random number per pixel. While 
 approach doesn't seem particularly resource-intensive, it would be an interesting
 challenge and an intruiging experiment whether or not anything comes of it."""
 
-def worker_x():
-    if (subdivisions_x<=0): subdivisions_x=1
+def worker_x(): # used for landscape images
     print(f"Determined subdivisions_x for processing: {subdivisions_x}")
     active_subdivision_x = [math.floor(width * ((i-1)/(subdivisions_x))), math.floor(width * ((i)/(subdivisions_x)))]
     active_subdivision_start_x = active_subdivision_x[0]
@@ -66,8 +65,7 @@ def worker_x():
         thread_end_time = time.monotonic()
     print(f"A \"columns-based\" thread finished after {thread_end_time - thread_start_time} seconds")
 
-def worker_y():
-    if (subdivisions_y<=0): subdivisions_y=1
+def worker_y(): # used for portrait (and square) images
     print(f"Determined subdivisions_y for processing: {subdivisions_y}")
     active_subdivision_y = [math.floor(height * ((i-1)/(subdivisions_y))), math.floor(height * ((i)/(subdivisions_y)))]
     active_subdivision_start_y = active_subdivision_y[0]
@@ -94,8 +92,8 @@ def worker_y():
     print(f"A \"rows-based\" thread finished after {thread_end_time - thread_start_time} seconds")
 
 
-pool = concurrent.futures.ThreadPoolExecutor(subdivisions)
-
+pool = concurrent.futures.ThreadPoolExecutor(subdivisions_x)
+pool = concurrent.futures.ThreadPoolExecutor(subdivisions_y)
 
 while (i) < subdivisions:
     i +=1
@@ -105,7 +103,7 @@ while (i) < subdivisions:
     elif (width < height):
         if (i==1): print("\nOptimizing processing for vertical aspect ratio.\n")
         pool.submit(worker_y)
-    elif (width ==height):
+    elif (width == height):
         if (i==1): print("\nThere is currently sub-optimal processing for the 1:1 aspect ratio. This might take a while.\n")
         pool.submit(worker_y)
 """I believe the way to truly optimize all processing would be to chop it into squares and do it a square at a time."""
@@ -115,4 +113,4 @@ pool.shutdown(wait=True)
 end_time = time.monotonic()
 print(f"\nAll threads completed!\nDuration: {end_time - start_time} seconds\n ")
 
-img.save("Random.png") 
+img.save("random.png") 
