@@ -1,5 +1,4 @@
-test.jpg
-test2.jpg
-test2.png
+*.jpg
+*.png
 randrangetest.py
-testBIG.png
+
