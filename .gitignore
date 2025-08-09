@@ -2,3 +2,7 @@
 *.png
 randrangetest.py
 
+old/random.im
+old/random.avif
+histogram.py
+.vscode/settings.json
