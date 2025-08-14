@@ -29,4 +29,4 @@ img = Image.merge("RGB", (img_r, img_g, img_b)) # math is so cool
 end_time = time.monotonic()
 print(f"\nAll processing completed!\nDuration: {end_time - start_time} seconds\n ")
 
-img.save("random-experimental.png") 
+img.save("random.png") 
