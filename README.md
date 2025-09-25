@@ -8,7 +8,7 @@ In command prompt or a terminal:
 ```bash
 python FuzzRGB.py
 ```
-The program will prompt you to input your desired image dimensions. It will generate the image and save it in the directory from which it was run.
+The program will prompt you to input your desired image dimensions. It will generate the image and save it as `random.png` in the directory from which it was run.
 ## Requirements
 If you do not have `numpy` or `pillow`, you must install them.
 

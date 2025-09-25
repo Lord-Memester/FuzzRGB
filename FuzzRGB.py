@@ -12,21 +12,22 @@ height = int(input("Enter image height in pixels: "))
 if (height<=0): height=1
 print(f"Height received: {height}")
 
-start_time = time.monotonic() #start overall timer
+start_time = time.monotonic() #start performance timer
 
-randarray = np.ceil((255*(default_rng().random((height, width, 3)))))# order of axes is (height, width, depth). In this use case, depth is the number of color channels.
+randarray = np.ceil((255*(default_rng().random((height, width, 3))))) # order of axes is (height, width, depth). In this use case, depth is the number of color channels.
 
-# Next step is to map the floats generated in the array such that 0.0 is 0 and 1.0 is 255. The floats generated within the array are a half-open interval, so values of 0.0 could be generated but values of 1.0 WILL NOT be generated. Accordingly, rounding of some sort will be needed to reach the full range of 24-bit color values. Update: did the mapping and rounding within the creation of the array. Very cool.
-"""Perhaps this could be done by multiplying the values by 255 and truncating the values to integers? I do worry that that could lead to a non-uniform distribution. Maybe rounding would be better?"""
+# Next step is to map the floats generated in the array such that 0.0 is 0 and 1.0 is 255. 
+# The floats generated within the array are a half-open interval, so values of 0.0 could be generated but values of 1.0 WILL NOT be generated. 
+# Accordingly, rounding of some sort will be needed to reach the full range of 24-bit color values. Update: did the mapping and rounding within the creation of the array.
 
+img_r = Image.fromarray(randarray[0:(height+1), 0:(width+1), 0]).convert("L") # red channel
+img_g = Image.fromarray(randarray[0:(height+1), 0:(width+1), 1]).convert("L") # green channel
+img_b = Image.fromarray(randarray[0:(height+1), 0:(width+1), 2]).convert("L") # blue channel
 
-img_r = Image.fromarray(randarray[0:(height+1), 0:(width+1), 0]).convert("L") # this
-img_g = Image.fromarray(randarray[0:(height+1), 0:(width+1), 1]).convert("L") # is
-img_b = Image.fromarray(randarray[0:(height+1), 0:(width+1), 2]).convert("L") # awesome
+img = Image.merge("RGB", (img_r, img_g, img_b)) # math is so cool :3
 
-img = Image.merge("RGB", (img_r, img_g, img_b)) # math is so cool
+end_time = time.monotonic() # end performance timer
 
-end_time = time.monotonic()
 print(f"\nAll processing completed!\nDuration: {end_time - start_time} seconds\n ")
 
 img.save("random.png") 
